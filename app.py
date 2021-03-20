@@ -130,18 +130,19 @@ def start(start):
     session = Session(engine)
 
     # Queries
-    start_data = session.query(func.min(measurements.tobs),func.max(measurements.tobs),func.avg(measurements.tobs)).filter(measurements.date == "2015-03-06").all()
+    min_temp = session.query(func.min(measurements.tobs)).filter(measurements.date >= start).all()
+    min_temp = min_temp[0][0]
+    
+    max_temp = session.query(func.max(measurements.tobs)).filter(measurements.date >= start).all()
+    max_temp = max_temp[0][0]
+
+    avg_temp = session.query(func.avg(measurements.tobs)).filter(measurements.date >= start).all()
+    max_temp = max_temp[0][0]
     
     session.close() 
-    
-    start_query= []
-    for min, max, avg in start_data:
-        start_dict = {}
-        start_dict["min_temp"] = min
-        start_dict["max_temp"] = max
-        start_dict["avg_temp"] = avg
-        start_query.append(start_dict)
 
+    start_query = [min_temp, max_temp,avg_temp]
+    
     return jsonify(start_query)
 
 @app.route("/api/v1.0/<start>/<end>")
@@ -150,19 +151,19 @@ def start_end(start,end):
     session = Session(engine)
 
     # Queries
-    start_end_data = session.query(func.min(Measurement.tobs),func.max(Measurement.tobs),func.avg(Measurement.tobs)).\
-                            filter(Measurement.date > "2016-04-22").filter(Measurement.date <= "2016-11-22").all()
+    min_temp = session.query(func.min(measurements.tobs)).filter(measurements.date >= start).filter(measurements.date <= end).all()
+    min_temp = min_temp[0][0]
+    
+    max_temp = session.query(func.max(measurements.tobs)).filter(measurements.date >= start).filter(measurements.date <= end).all()
+    max_temp = max_temp[0][0]
+    
+    avg_temp = session.query(func.avg(measurements.tobs)).filter(measurements.date >= start).filter(measurements.date <= end).all()
+    max_temp = max_temp[0][0]
     
     session.close()
 
-    start_end_query = []
-    for min, max, avg in start_end_data:
-        start_end_dict = {}
-        start_end_dict["min_temp"] = min
-        start_end_dict["max_temp"] = max
-        start_end_dict["avg_temp"] = round(avg,2)
-        start_end_query.append(start_end_dict)
-
+    start_end_query = [min_temp, max_temp,avg_temp]
+    
     return jsonify(start_end_query)
 
 if __name__ == '__main__':
